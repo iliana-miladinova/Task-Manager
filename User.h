@@ -1,27 +1,26 @@
 #pragma once
-#include "Task.h"
 #include "MyString.h"
-#include "MyVector.hpp"
+#include <fstream>
+#include "HelperFunctions.h"
 
 class User
 {
-private:
+protected:
 	MyString username;
 	MyString password;
-
-	Vector<Task> tasks;
-	Vector<Task> dashboardTasks;
-	Vector<MyString> colaborations;
-
-	//void updateDashBoardTask();
 public:
+	User() = default;
 	User(const MyString& username, const MyString& password);
-
+	virtual ~User() = default;
 	const MyString& getUsername() const;
 	const MyString& getPassword() const;
 
+	virtual void serializeUser(std::ofstream& ofs) const;
+	virtual void deserializeUser(std::ifstream& ifs);
+
+	virtual const MyString& getUserType() const = 0;
+
 	bool checkPassword(const MyString& password) const;
-	
-	/*void addTask(const Task& task);*/
-	void addTask(const MyString& name, const MyString& dueDate, const MyString& description);
+	/*void saveTasks() const;
+	void loadTasks();*/
 };

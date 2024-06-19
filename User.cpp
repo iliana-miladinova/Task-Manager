@@ -1,7 +1,5 @@
 #include "User.h"
 
-#include "HelperFunctions.h"
-
 User::User(const MyString& username, const MyString& password) :username(username), password(password)
 {
 
@@ -17,66 +15,54 @@ const MyString& User::getPassword() const
 	return password;
 }
 
-
-bool User::checkPassword(const MyString& password) const
+void User::serializeUser(std::ofstream& ofs) const
 {
-	return this->password == password;
+	size_t usernameLen = username.getSize();
+	ofs.write((const char*)&usernameLen, sizeof(usernameLen));
+	ofs.write(username.c_str(), usernameLen);
+	size_t passwordLen = password.getSize();
+	ofs.write((const char*)&passwordLen, sizeof(passwordLen));
+	ofs.write(password.c_str(), passwordLen);
+
 }
 
-void User::addTask(const MyString& name, const MyString& dueDate, const MyString& description)
+void User::deserializeUser(std::ifstream& ifs) 
 {
-	Task tempTask(0, name, dueDate, Status::ON_HOLD, description); 
-	tempTask.getDueDateFromString(); 
-	for (size_t i = 0; i < tasks.getSize(); i++)
-	{
-		if (tasks[i].getName() == name && HelperFunctions::compareDates(tasks[i].getDueDateFromString(), tempTask.getDueDateFromString()))
-		{
-			throw std::invalid_argument("Task with this name and due date already exists!");
-		}
-		/*updateDashBoardTask();*/
-	}
-	int newId = tasks.getSize() + 1; 
-	Task newTask(newId, name, dueDate, Status::ON_HOLD, description);
-	tasks.pushBack(newTask);
+    size_t usernameLen;
+    ifs.read((char*)&usernameLen, sizeof(usernameLen));
+    char* usernameBuffer = new char[usernameLen + 1];
+    ifs.read(usernameBuffer, usernameLen);
+    usernameBuffer[usernameLen] = '\0';
+    username = MyString(usernameBuffer);
+    delete[] usernameBuffer;
+
+    size_t passwordLen;
+    ifs.read((char*)&passwordLen, sizeof(passwordLen));
+    char* passwordBuffer = new char[passwordLen + 1];
+    ifs.read(passwordBuffer, passwordLen);
+    passwordBuffer[passwordLen] = '\0';
+    password = MyString(passwordBuffer);
+    delete[] passwordBuffer;
 }
 
-////void User::addTask(/*const Task& task*/
-//void User::addTask(const MyString& name, const MyString& dueDate, const MyString& description)
-//{
-//	//int newId = tasks.getSize() + 1;  // Генериране на нов уникален ID
-//	//Task newTask(newId, name, dueDate, Status::ON_HOLD, description);
-//	/*try
-//	{*/
-//		Task tempTask(0, name, dueDate, Status::ON_HOLD, description); // временно създаваме задача за проверка на датата
-//		tempTask.getDueDateFromString(); //
-//		for (size_t i = 0; i < tasks.getSize(); i++)
-//		{
-//			/*if (HelperFunctions::compareDates(task.getDueDateFromString(),tasks[i].getDueDateFromString()) && task.getName()==tasks[i].getName())
-//			{
-//				throw std::invalid_argument("Task with thIS name and due date already exists!");
-//			}*/
-//			/*if (newTask.getName() == tasks[i].getName() && HelperFunctions::compareDates(newTask.getDueDateFromString(), tasks[i].getDueDateFromString()))
-//			{
-//				throw std::invalid_argument("Task with this name and due date already exists!");
-//			}*/
-//			if (tasks[i].getName() == name && HelperFunctions::compareDates(tasks[i].getDueDateFromString(), tempTask.getDueDateFromString())) 
-//			{
-//				throw std::invalid_argument("Task with this name and due date already exists!");
-//			}
+
+bool User::checkPassword(const MyString& password) const 
+{
+    return this->password == password;
+}
+
+//void User::loadTasks() {
+//    std::ifstream inFile((username + "tasks.dat").c_str(), std::ios::binary);
+//    if (!inFile) return;
 //
-//			//int newId = tasks.getSize() + 1;  // Генериране на нов уникален ID
-//			//Task newTask(newId, name, dueDate, Status::ON_HOLD, description);
-//			/*tasks.pushBack(newTask);*/
-//			/*tasks.pushBack(task);
-//			updateDashBoardTask();*/
-//		}
-//		int newId = tasks.getSize() + 1; // Генериране на нов уникален ID
-//		Task newTask(newId, name, dueDate, Status::ON_HOLD, description);
-//		tasks.pushBack(newTask);
-//	//}
-//	//catch (const std::invalid_argument& e) 
-//	//{
-//	//	std::cout << e.what() << std::endl;
-//	//	throw; // препредаваме изключението нагоре
-//	//}
+//    size_t tasksCount;
+//    inFile.read(reinterpret_cast<char*>(&tasksCount), sizeof(tasksCount));
+//    tasks.clear();
+//
+//    for (size_t i = 0; i < tasksCount; i++) {
+//        Polymorphic_Ptr<Task> task = Task::deserialize(inFile);
+//        tasks.pushBack(task);
+//    }
+//
+//    inFile.close();
 //}

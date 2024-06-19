@@ -1,8 +1,15 @@
 #include "Task.h"
-
-Task::Task(int id, const MyString& name, const MyString& dueDate, const Status& status, const MyString& description):id(id),dueDate(dueDate), name(name),/*dueDate(dueDate),*/status(status),description(description)
+Task::Task()
 {
-    //setDueDate(dueDate);
+	id = 0;
+	name = "";
+	dueDate = "";
+	status = Status::IN_PROCESS;
+	description = "";
+}
+Task::Task(int id, const MyString& name, const MyString& dueDate, const Status& status, const MyString& description) :id(id), dueDate(dueDate), name(name),/*dueDate(dueDate),*/status(status), description(description)
+{
+	//setDueDate(dueDate);
 }
 
 std::tm Task::getDueDateFromString() const
@@ -31,71 +38,148 @@ const MyString& Task::getName() const
 	return name;
 }
 
-const MyString& Task::getStringFromStatus() const
+MyString Task::getStringFromStatus() const
 {
+	MyString statusStr;
 	switch (status)
 	{
 	case Status::ON_HOLD:
-		return "ON HOLD";
+		statusStr = "ON HOLD";
 		break;
 	case Status::IN_PROCESS:
-		return "IN PROCESS";
+		statusStr = "IN PROCESS";
 		break;
 	case Status::DONE:
-		return "DONE";
+		statusStr = "DONE";
 		break;
 	case Status::OVERDUE:
-		return "OVERDUE";
+		statusStr = "OVERDUE";
 		break;
 	default:
 		break;
 	}
-}
-void Task::showTask() const
-{
-	MyString statusStr = getStringFromStatus();
-	std::cout << "Id: " << id << " Name: " << name << " due date: " << dueDate << " status: "<<statusStr<<" description: " << description << std::endl;
+	return statusStr;
 }
 
-//bool Task::isValidDateFormat(const MyString& date) const{
-//    // Проверка за валиден формат на датата (DD-MM-YYYY)
-//    if (date.getSize() != 10) // Дължината трябва да бъде 10 символа за формата DD-MM-YYYY
-//        return false;
-//
-//    for (int i = 0; i < 10; ++i) {
-//        if (i == 2 || i == 5) {
-//            if (date[i] != '-') // Проверка за наличие на тирета в позициите 2 и 5
-//                return false;
-//        }
-//        else {
-//            if (!isdigit(date[i])) // Проверка дали всички останали символи са цифри
-//                return false;
-//        }
-//    }
-//    return true;
-//
-//    //// Проверка за валидни числови стойности за ден, месец и година
-//    //int day = stoi(date.substr(0, 2));
-//    //int month = stoi(date.substr(3, 2));
-//    //int year = stoi(date.substr(6, 4));
-//
-//    //if (month < 1 || month > 12) // Проверка за валиден месец
-//    //    return false;
-//
-//    //if (day < 1 || day > 31) // Проверка за валиден ден
-//    //    return false;
-//
-//    //// Проверка за валидна година (можете да добавите допълнителни проверки за годината, ако е необходимо)
-//    //if (year < 1900 || year > 2100)
-//    //    return false;
-//
-//    //return true;
-//}
-//////const MyString& Task::getDueDate() const
-//////{
-//////    if (!isValidDateFormat(dueDate))
-//////    {
-//////        throw std::exception("Invalid date format");
-//////    }
-//////	return dueDate;
-////}
+void Task::showTask() const
+{
+	const MyString statusStr = getStringFromStatus();
+	std::cout << "Id: " << id << std::endl;
+	std::cout << " Name: " << name << std::endl;
+	std::cout << " due date: " << dueDate << std::endl;
+	std::cout << " status: " << statusStr << std::endl;
+	std::cout << " description: " << description << std::endl;
+}
+
+int Task::getId() const
+{
+	return id;
+}
+
+Status Task::getStatus() const
+{
+	return status;
+}
+
+void Task::setStatus(const Status& status)
+{
+	this->status = status;
+}
+
+const MyString& Task::getDueDate() const
+{
+	return dueDate;
+}
+const MyString& Task::getDescription() const
+{
+	return description;
+}
+
+void Task::serialize(std::ofstream& ofs) const
+{
+	ofs.write((const char*)&id, sizeof(id));
+
+	size_t nameLen = name.getSize();
+	ofs.write((const char*)&nameLen, sizeof(nameLen));
+	ofs.write(name.c_str(), nameLen);
+
+	size_t dueDateLen = dueDate.getSize();
+	ofs.write((const char*)&dueDateLen, sizeof(dueDateLen));
+	ofs.write(dueDate.c_str(), dueDateLen);
+
+	ofs.write((const char*)&status, sizeof(status));
+
+	size_t descriptionLen = description.getSize();
+	ofs.write((const char*)&descriptionLen, sizeof(descriptionLen));
+	ofs.write(description.c_str(), descriptionLen);
+}
+
+void Task::deserialize(std::ifstream& ifs)
+{
+	/*ifs.read((char*)&id, sizeof(id));
+
+	size_t nameLen;
+	ifs.read((char*)&nameLen, sizeof(nameLen));
+	char* nameBuffer = new char[nameLen + 1];
+	ifs.read(nameBuffer, nameLen);
+	nameBuffer[nameLen] = '\0';
+	name = MyString(nameBuffer);
+	delete[] nameBuffer;
+
+	size_t dueDateLen;
+	ifs.read((char*)&dueDateLen, sizeof(dueDateLen));
+	char* dueDateBuffer = new char[dueDateLen + 1];
+	ifs.read(dueDateBuffer, dueDateLen);
+	dueDateBuffer[dueDateLen] = '\0';
+	dueDate = MyString(dueDateBuffer);
+	delete[] dueDateBuffer;
+
+	ifs.read((char*)&status, sizeof(status));
+
+	size_t descriptionLen;
+	ifs.read((char*)&descriptionLen, sizeof(descriptionLen));
+	char* descriptionBuffer = new char[descriptionLen + 1];
+	ifs.read(descriptionBuffer, descriptionLen);
+	descriptionBuffer[descriptionLen] = '\0';
+	description = MyString(descriptionBuffer);
+	delete[] descriptionBuffer;*/
+
+	ifs.read((char*)&id, sizeof(id));
+
+	size_t nameLen;
+	ifs.read((char*)&nameLen, sizeof(nameLen));
+	char* nameBuffer = new char[nameLen + 1];
+	ifs.read(nameBuffer, nameLen);
+	nameBuffer[nameLen] = '\0';
+	name = MyString(nameBuffer);
+	delete[] nameBuffer;
+
+	size_t dueDateLen;
+	ifs.read((char*)&dueDateLen, sizeof(dueDateLen));
+	char* dueDateBuffer = new char[dueDateLen + 1];
+	ifs.read(dueDateBuffer, dueDateLen);
+	dueDateBuffer[dueDateLen] = '\0';
+	dueDate = MyString(dueDateBuffer);
+	delete[] dueDateBuffer;
+
+	ifs.read((char*)&status, sizeof(status));
+
+	size_t descriptionLen;
+	ifs.read((char*)&descriptionLen, sizeof(descriptionLen));
+	char* descriptionBuffer = new char[descriptionLen + 1];
+	ifs.read(descriptionBuffer, descriptionLen);
+	descriptionBuffer[descriptionLen] = '\0';
+	description = MyString(descriptionBuffer);
+	delete[] descriptionBuffer;
+}
+
+Task* Task::clone() const
+{
+	return new Task(*this);
+}
+
+const MyString& Task::getType() const
+{
+	static MyString type = "Task";
+	return type;
+}
