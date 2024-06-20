@@ -1,22 +1,70 @@
 #include "Dashboard.h"
 
-Dashboard::Dashboard(const MyString& userFile) : filename(userFile + "Dashboard.dat") 
-{
-
-}
-
 void Dashboard::addTask(Polymorphic_Ptr<Task> task) {
     tasks.pushBack(task);
-    saveToFile();
 }
 
 void Dashboard::removeTask(int taskId) {
     for (size_t i = 0; i < tasks.getSize(); ++i) {
         if (tasks[i]->getId() == taskId) {
             tasks.erase(i);
-            saveToFile();
             break;
         }
+    }
+}
+
+const Vector<Polymorphic_Ptr<Task>>& Dashboard::getTasks() const {
+    return tasks;
+}
+
+void Dashboard::serialize(std::ofstream& ofs) const {
+    size_t taskCount = tasks.getSize();
+    ofs.write((const char*)&taskCount, sizeof(taskCount));
+    for (size_t i = 0; i < taskCount; ++i) {
+        tasks[i]->serialize(ofs);
+    }
+}
+
+void Dashboard::deserialize(std::ifstream& ifs) {
+    /*size_t taskCount;*/
+   /* ifs.read((char*)&taskCount, sizeof(taskCount));
+    tasks.clear();
+    for (size_t i = 0; i < taskCount; ++i) {
+        MyString taskType;
+        taskType.deserialize(ifs);
+
+        Polymorphic_Ptr<Task> task;
+        if (taskType == "Task") {
+            task.reset(new Task());
+        }
+        else if (taskType == "ProjectTask") {
+            task.reset(new ProjectTask());
+        }
+        task->deserialize(ifs);
+        tasks.pushBack(task);
+    }*/
+    size_t taskCount;
+    ifs.read((char*)&taskCount, sizeof(taskCount));
+    tasks.clear();
+    for (size_t i = 0; i < taskCount; ++i) {
+        MyString taskType;
+        size_t taskTypeLen;
+        ifs.read((char*)&taskTypeLen, sizeof(taskTypeLen));
+        char* taskTypeBuffer = new char[taskTypeLen + 1];
+        ifs.read(taskTypeBuffer, taskTypeLen);
+        taskTypeBuffer[taskTypeLen] = '\0';
+        taskType = MyString(taskTypeBuffer);
+        delete[] taskTypeBuffer;
+
+        Polymorphic_Ptr<Task> task;
+        if (taskType == "Task") {
+            task.reset(new Task());
+        }
+        else if (taskType == "ProjectTask") {
+            task.reset(new ProjectTask());
+        }
+        task->deserialize(ifs);
+        tasks.pushBack(task);
     }
 }
 
@@ -29,10 +77,6 @@ void Dashboard::update(const Vector<Polymorphic_Ptr<Task>>& allTasks) {
         }
     }
     saveToFile();
-}
-
-const Vector<Polymorphic_Ptr<Task>>& Dashboard::getTasks() const {
-    return tasks;
 }
 
 void Dashboard::saveToFile() const {

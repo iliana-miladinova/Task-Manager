@@ -48,6 +48,16 @@ public:
 	virtual Task* clone() const;
 
 	virtual const MyString& getType() const;
+
+	/*void showTask() const
+	{
+		const MyString statusStr = getStringFromStatus();
+		std::cout << "Id: " << id << std::endl;
+		std::cout << " Name: " << name << std::endl;
+		std::cout << " due date: " << dueDate << std::endl;
+		std::cout << " status: " << statusStr << std::endl;
+		std::cout << " description: " << description << std::endl;
+	}*/
 	/*const MyString& getDate() const;*/
 	/*const MyString& getDueDate() const;*/
 };

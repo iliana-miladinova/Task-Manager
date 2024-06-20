@@ -1,4 +1,5 @@
 #pragma once
+#pragma once
 #include <iostream>
 
 class MyString
@@ -29,10 +30,10 @@ public:
     friend std::istream& operator>>(std::istream& is, MyString& ref);
     friend MyString operator+(const MyString& lhs, const MyString& rhs);
 
-    void resize(unsigned newAllocatedDataSize);
+    /*void resize(unsigned newAllocatedDataSize);*/
 private:
     explicit MyString(size_t stringLength);
-    /* void resize(unsigned newAllocatedDataSize);*/
+    void resize(unsigned newAllocatedDataSize);
 
     void free();
     void copyFrom(const MyString& other);
