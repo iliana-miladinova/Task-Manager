@@ -4,6 +4,7 @@
 #include <sstream>
 #include <iomanip>
 #include <fstream>
+#include "PolymorphicPtr.hpp"
 
 enum class Status
 {
@@ -43,11 +44,16 @@ public:
 	const MyString& getDescription() const;
 
 	virtual void serialize(std::ofstream& ofs) const;
-	virtual void deserialize(std::ifstream& ifs);
+	virtual void /*Polymorphic_Ptr<Task> */deserialize(std::ifstream& ifs);
 
 	virtual Task* clone() const;
 
 	virtual const MyString& getType() const;
+
+	void setName(const MyString& name);
+	void setDescription(const MyString& description);
+
+	void startTask();
 
 	/*void showTask() const
 	{

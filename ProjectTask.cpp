@@ -7,11 +7,23 @@ ProjectTask::ProjectTask(int id, const MyString& name, const MyString& dueDate, 
 
 void ProjectTask::serialize(std::ofstream& ofs) const
 {
-    Task::serialize(ofs);
+    /*Task::serialize(ofs);
 
     size_t assigneeLen = assignee.getSize();
     ofs.write((const char*)&assigneeLen, sizeof(assigneeLen));
-    ofs.write(assignee.c_str(), assigneeLen);
+    ofs.write(assignee.c_str(), assigneeLen);*/
+
+    //Task::serialize(ofs);
+
+    //// Сериализиране на специфичната част на ProjectTask
+    //size_t assigneeLen = assignee.getSize();
+    //ofs.write((const char*)&assigneeLen, sizeof(assigneeLen));
+    //ofs.write(assignee.c_str(), assigneeLen);
+
+    Task::serialize(ofs);
+    size_t assigneeLength = assignee.getSize();
+    ofs.write(reinterpret_cast<const char*>(&assigneeLength), sizeof(assigneeLength));
+    ofs.write(assignee.c_str(), assigneeLength);
     /* ofs.write((const char*)&id, sizeof(id));
 
      size_t nameLen = name.getSize();
@@ -40,16 +52,40 @@ void ProjectTask::serialize(std::ofstream& ofs) const
 }
 
 void ProjectTask::deserialize(std::ifstream& ifs)
-{
-    Task::deserialize(ifs);
+{/*
+    Task::deserialize(ifs);*/
 
-    size_t assigneeLen;
+    Task::deserialize(ifs);
+    size_t assigneeLength;
+    ifs.read(reinterpret_cast<char*>(&assigneeLength), sizeof(assigneeLength));
+    char* assigneeBuffer = new char[assigneeLength + 1];
+    ifs.read(assigneeBuffer, assigneeLength);
+    assigneeBuffer[assigneeLength] = '\0';
+    assignee = MyString(assigneeBuffer);
+    delete[] assigneeBuffer;
+
+    /*size_t assigneeLen;
     ifs.read((char*)&assigneeLen, sizeof(assigneeLen));
     char* assigneeBuffer = new char[assigneeLen + 1];
     ifs.read(assigneeBuffer, assigneeLen);
     assigneeBuffer[assigneeLen] = '\0';
     assignee = MyString(assigneeBuffer);
-    delete[] assigneeBuffer;
+    delete[] assigneeBuffer;*/
+
+    //Task baseTask = Task::deserialize(ifs);
+    //this->name = baseTask.getName();
+    //this->dueDate = baseTask.getDueDate();
+    //this->description = baseTask.getDescription();
+    ///*this->completed = baseTask.isCompleted();*/
+
+    // Десериализиране на специфичната част на ProjectTask
+    /*size_t assigneeLen;
+    ifs.read((char*)&assigneeLen, sizeof(assigneeLen));
+    char* assigneeBuffer = new char[assigneeLen + 1];
+    ifs.read(assigneeBuffer, assigneeLen);
+    assigneeBuffer[assigneeLen] = '\0';
+    assignee = MyString(assigneeBuffer);
+    delete[] assigneeBuffer;*/
     ////Task::deserialize(ifs);  // Десериализиране на базовите атрибути
     //ifs.read((char*)&id, sizeof(id));
 

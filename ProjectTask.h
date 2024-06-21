@@ -14,7 +14,7 @@ public:
 	ProjectTask(int id, const MyString& name, const MyString& dueDate, const Status& status, const MyString& description, const MyString& assignee);
 
 	void serialize(std::ofstream& ofs) const override;
-	void deserialize(std::ifstream& ifs) override;
+	/*void*/ /*Polymorphic_Ptr<Task>*/ void deserialize(std::ifstream& ifs) override;
 	void showTask() const override;
 
 	Task* clone() const override;

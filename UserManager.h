@@ -28,6 +28,7 @@
 class UserManager {
 private:
     Vector<User> users;
+    User* currentUser = nullptr;
     const MyString userFile = "users.dat"; // File for storing usernames and passwords
     const MyString taskFile = "tasks.dat"; // File for storing tasks and dashboards
 
@@ -36,10 +37,42 @@ public:
     ~UserManager();
 
     void registerUser(const MyString& username, const MyString& password);
-    User* loginUser(const MyString& username, const MyString& password);
+    void loginUser(const MyString& username, const MyString& password);
+    void logoutUser();
 
     void loadUsers();
-    void saveUsers() const;
+    void saveUsers() /*const*/;
+
+    void loadTasks(const MyString& username);
+    void saveTasks(const MyString& username) /*const*/;
+
+    User* findUser(const MyString& username);
+
+    void updateTaskName(int id, const MyString& name);
+
+    void updateTaskDescription(int id, const MyString& description);
+
+    void removeTaskFromDashboard(int id);
+
+    void addTaskToDashboard(int id);
+
+    void startTask(int id);
+
+    void addTask(const MyString& name, const MyString& dueDate, const MyString& description);
+
+    void deleteTask(int id);
+
+    void getTask(const MyString& name) const;
+
+    void getTask(int id) const;
+
+    void listTasks(const MyString& dueDate) const;
+
+    void listTasks() const;
+
+    void listCompletedTasks() const;
+
+    User* getCurrentUser() const;
 };
 
 //class UserManager {
