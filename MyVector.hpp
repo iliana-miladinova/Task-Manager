@@ -15,7 +15,7 @@ class Vector
     void free();
     void copyFrom(const Vector<T>& other);
     void moveFrom(Vector<T>&& other);
-   /* void resize(size_t newCapacity);*/
+    /* void resize(size_t newCapacity);*/
 
 public:
     Vector();

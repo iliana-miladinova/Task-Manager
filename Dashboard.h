@@ -8,9 +8,7 @@
 
 class Dashboard {
 private:
-    Vector<Polymorphic_Ptr<Task>> tasks; // Задачи в Dashboard-а
-
-   /*???*/ /*MyString filename;*/
+    Vector<Polymorphic_Ptr<Task>> tasks;
 
 public:
     void addTask(Polymorphic_Ptr<Task> task);
@@ -20,8 +18,6 @@ public:
     void serialize(std::ofstream& ofs) const;
     void deserialize(std::ifstream& ifs);
 
-    void saveToFile(const MyString& filename) const;
-    void loadFromFile(const MyString& filename);
     void update(const Vector<Polymorphic_Ptr<Task>>& allTasks);
 
     void addTaskById(int id);

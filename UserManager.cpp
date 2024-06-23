@@ -1,513 +1,234 @@
-//#include "UserManager.h"
-//
-//UserManager::UserManager()
-//{
-//    loadUsers();
-//}
-//
-//UserManager::~UserManager()
-//{
-//    saveUsers();
-//}
-//
-//void UserManager::registerUser(const MyString& username, const MyString& password)
-//{
-//    for (size_t i = 0; i < users.getSize(); i++)
-//    {
-//        if (users[i].getUsername() == username)
-//        {
-//            throw std::invalid_argument("Username already exists!");
-//        }
-//    }
-//    User newUser(username, password);
-//    users.pushBack(newUser);
-//
-//    userCount++;
-//    /*newUser.saveTasks();*/
-//}
-//
-//User* UserManager::loginUser(const MyString& username, const MyString& password)
-//{
-//    for (size_t i = 0; i < users.getSize(); i++)
-//    {
-//        if (users[i].getUsername() == username)
-//        {
-//            if (users[i].checkPassword(password))
-//            {
-//                /*users[i].loadTasks();*/
-//                return &users[i];
-//            }
-//            else
-//            {
-//                throw std::invalid_argument("Incorrect password!");
-//            }
-//        }
-//    }
-//    throw std::invalid_argument("User not found!");
-//}
-//
-//void UserManager::loadUsers(/*const MyString& filename*/) {
-//    std::ifstream ifs(filename.c_str(), std::ios::binary);
-//    if (!ifs) {
-//        throw std::runtime_error("Cannot open file for reading.");
-//    }
-//
-//    /*size_t userCount;
-//    ifs.read((char*)&userCount, sizeof(userCount));*/
-//   /* size_t userCount;*/
-//    ifs.read(reinterpret_cast<char*>(&userCount), sizeof(userCount));
-//   /* if (ifs.fail()) {
-//        throw std::runtime_error("Error reading user count from file.");
-//    }*/
-//
-//    users.clear();
-//
-//    /*users.clear();*/
-//    for (size_t i = 0; i < userCount; ++i) {
-//       /* MyString userType;
-//        userType.deserialize(ifs);*/
-//
-//        User user;
-//        if (ifs.fail()) {
-//            throw std::runtime_error("Error deserializing user from file.");
-//        }
-//        /*if (userType == "IndividualUser") {
-//            user.reset(new IndividualUser());
-//        } */// Добавяне на други типове потребители, ако има такива
-//
-//        user.deserializeUser(ifs);
-//        users.pushBack(user);
-//    }
-//
-//    ifs.close();
-//}
-//
-//void UserManager::saveUsers(/*const MyString& filename*/) const {
-//    std::ofstream ofs(filename.c_str(), std::ios::binary);
-//    if (!ofs) {
-//        throw std::runtime_error("Cannot open file for writing.");
-//    }
-//
-//    /*size_t userCount = users.getSize();*/
-//    ofs.write((const char*)&userCount, sizeof(userCount));
-//
-//    for (size_t i = 0; i < userCount; ++i) {
-//       /* MyString userType = users[i]->getUserType();
-//        userType.serialize(ofs);
-//        users[i]->serializeUser(ofs);*/
-//        users[i].serializeUser(ofs);
-//    }
-//}
-//
-////void UserManager::loadUsers()
-////{
-////    std::ifstream inFile(filename, std::ios::binary);
-////    if (!inFile) return;
-////
-////    size_t usersCount;
-////    inFile.read(reinterpret_cast<char*>(&usersCount), sizeof(usersCount));
-////    users.clear();
-////
-////    for (size_t i = 0; i < usersCount; i++)
-////    {
-////        User user;
-////        user.deserializeUser(inFile);
-////        /*user.loadTasks();*/
-////        users.pushBack(user);
-////    }
-////
-////    inFile.close();
-////}
-//
-////void UserManager::saveUsers() const
-////{
-////    std::ofstream outFile(filename, std::ios::binary);
-////    if (!outFile) return;
-////
-////    size_t usersCount = users.getSize();
-////    outFile.write(reinterpret_cast<const char*>(&usersCount), sizeof(usersCount));
-////
-////    for (size_t i = 0; i < usersCount; i++)
-////    {
-////        users[i].serializeUser(outFile);
-////        /*users[i].saveTasks();*/
-////    }
-////
-////    outFile.close();
-//////}
-//
-// 
-// 
-// Raboti
 #include "UserManager.h"
 #include <fstream>
 
-UserManager::UserManager() {
+UserManager::UserManager() 
+{
     loadUsers();
+    loadCollaborations();
 }
 
-UserManager::~UserManager() {
-    if (currentUser) {
+UserManager::~UserManager() 
+{
+    if (currentUser)
+    {
         saveTasks(currentUser->getUsername());
+        saveCollaborations();
+        saveDashboard();
     }
     saveUsers();
 }
 
-void UserManager::registerUser(const MyString& username, const MyString& password) {
-    if (findUser(username) != nullptr) 
+void UserManager::registerUser(const MyString& username, const MyString& password) 
+{
+    if (findUser(username) != nullptr)
     {
-        throw std::runtime_error("User with this username already exists");// User already exists
+        throw std::runtime_error("User with this username already exists");
     }
     users.pushBack(User(username, password));
     saveUsers();
- /* ???  *//*saveTasks(username);*/
-   /* return true;*/
 }
 
-void UserManager::loginUser(const MyString& username, const MyString& password) {
-   /* for (size_t i = 0; i < users.getSize(); ++i) {
-        if (users[i].getUsername() == username && users[i].checkPassword(password)) {
-            return &users[i];
-        }
-    }*/
-   // for (size_t i = 0; i < users.getSize(); ++i) {
-   //     if (users[i].getUsername() == username && users[i].checkPassword(password)) {
-   //         currentUser = &users[i];
-   //     }
-   // }
-   // //User* user = findUser(username);
-   // //if (user!=nullptr&&user->checkPassword(password))
-   // //{
-   // //    currentUser= /*&*/user;
-   // //    loadTasks(username);
-   // //}
-   ///* else
-   // {*/
-   //     throw std::runtime_error("Invalid username or password!");
-   ///* }*/
+void UserManager::loginUser(const MyString& username, const MyString& password) 
+{
+
 
     User* user = findUser(username);
-    if (user && user->checkPassword(password)) {
+    if (user && user->checkPassword(password))
+    {
         currentUser = user;
-        std::cout << "Welcome back, " << username << "!\n";
         loadTasks(username);
+        loadDashboard();
+        loadCollaborations();
     }
-    else {
-        std::cout << "Invalid username or password!\n";
+    else 
+    {
+        throw std::runtime_error("Invalid username or password!");
     }
 }
 
-void UserManager::logoutUser() {
-    /*currentUser = nullptr;*/
-    if (currentUser) {
+void UserManager::logoutUser() 
+{
+    if (currentUser) 
+    {
         saveTasks(currentUser->getUsername());
+        saveDashboard();
+        saveCollaborations();
         currentUser = nullptr;
     }
 }
 
-void UserManager::loadUsers() {
-  /*  std::ifstream userIfs(userFile.c_str(), std::ios::binary);
-    if (userIfs) {
-        size_t userCount;
-        userIfs.read((char*)&userCount, sizeof(userCount));
-        users.clear();
-        for (size_t i = 0; i < userCount; ++i) {
-            User user;
-            user.deserializeUser(userIfs);
-            users.pushBack(user);
-        }
-    }*/
-
+void UserManager::loadUsers() 
+{
     std::ifstream ifs(userFile.c_str(), std::ios::binary);
     if (!ifs) return;
 
     size_t userCount;
-    ifs.read(reinterpret_cast<char*>(&userCount), sizeof(userCount));
-    for (size_t i = 0; i < userCount; ++i) {
+    ifs.read((char*)&userCount, sizeof(userCount));
+    for (size_t i = 0; i < userCount; i++) 
+    {
         User user;
         user.deserializeUser(ifs);
         users.pushBack(user);
     }
     ifs.close();
-
-    ///*std::ifstream taskIfs(taskFile.c_str(), std::ios::binary);
-    //if (taskIfs) {
-    //    for (size_t i = 0; i < users.getSize(); ++i) {
-    //        users[i].deserializeTasks(taskIfs);
-    //    }
-    //}*/
 }
 
-void UserManager::saveUsers() /*const */{
-    std::ofstream userOfs(userFile.c_str(), std::ios::binary);
-    if (userOfs) {
-        size_t userCount = users.getSize();
-        userOfs.write((const char*)&userCount, sizeof(userCount));
-        for (size_t i = 0; i < userCount; ++i) {
-            users[i].serializeUser(userOfs);
-        }
+void UserManager::saveUsers() const  
+{
+    std::ofstream ofs(userFile.c_str(), std::ios::binary);
+    size_t userCount = users.getSize();
+    ofs.write((const char*)&userCount, sizeof(userCount));
+    for (size_t i = 0; i < userCount; i++) 
+    {
+        users[i].serializeUser(ofs);
     }
-
-   /* std::ofstream taskOfs(taskFile.c_str(), std::ios::binary);
-    if (taskOfs) {
-        for (size_t i = 0; i < users.getSize(); ++i) {
-            users[i].serializeTasks(taskOfs);
-        }
-    }*/
+    ofs.close();
 }
 
 void UserManager::loadTasks(const MyString& username)
 {
-    //std::ifstream ifs(taskFile.c_str(), std::ios::binary);
-    //if (ifs) {
-    //    while (!ifs.eof()) {
-    //        User tempUser;
-    //        tempUser.deserializeUser(ifs);
-    //        if (!ifs) break;
-    //        if (tempUser.getUsername() == username) {
-    //            currentUser->deserializeTasks(ifs);
-    //            return;
-    //        }
-    //        else {
-    //            tempUser.deserializeTasks(ifs);
-    //            if (!ifs) break;// Skip other user's tasks
-    //        }
-    //    }
-    //}
-
-    /*std::ifstream ifs(taskFile.c_str(), std::ios::binary);
-    if (ifs) {
-        while (!ifs.eof()) {
-            User tempUser;
-            tempUser.deserializeUser(ifs);
-            if (tempUser.getUsername() == username) {
-                currentUser = findUser(username);
-                if (currentUser) {
-                    currentUser->deserializeTasks(ifs);
-                }
-                break;
-            }
-            else {
-                tempUser.deserializeTasks(ifs);
-            }
-        }
-    }*/
-
     std::ifstream ifs(taskFile.c_str(), std::ios::binary);
     if (!ifs) return;
 
     size_t taskCount;
-    ifs.read(reinterpret_cast<char*>(&taskCount), sizeof(taskCount));
-    for (size_t i = 0; i < taskCount; ++i) {
+    ifs.read((char*)&taskCount, sizeof(taskCount));
+    for (size_t i = 0; i < taskCount; i++)
+    {
         MyString user;
         size_t usernameLength;
-        ifs.read(reinterpret_cast<char*>(&usernameLength), sizeof(usernameLength));
+        ifs.read((char*)&usernameLength, sizeof(usernameLength));
         char* usernameBuffer = new char[usernameLength + 1];
         ifs.read(usernameBuffer, usernameLength);
         usernameBuffer[usernameLength] = '\0';
         user = MyString(usernameBuffer);
         delete[] usernameBuffer;
-        if (user == username) {
+        if (user == username) 
+        {
             currentUser->deserializeTasks(ifs);
         }
         else {
             size_t taskSize;
-            ifs.read(reinterpret_cast<char*>(&taskSize), sizeof(taskSize));
+            ifs.read((char*)&taskSize, sizeof(taskSize));
             ifs.seekg(taskSize, std::ios::cur);
         }
     }
     ifs.close();
-
-    /*!!!*/
-    /*std::ifstream ifs(taskFile.c_str(), std::ios::binary);
-    if (ifs) {
-        while (!ifs.eof()) {
-            User tempUser;
-            tempUser.deserializeUser(ifs);
-            if (!ifs) break;
-            if (tempUser.getUsername() == username) {
-                currentUser->deserializeTasks(ifs);
-                return;
-            }
-            else {
-                tempUser.deserializeTasks(ifs);
-                if (!ifs) break;
-            }
-        }
-    }*/
+ 
 }
 
-void UserManager::saveTasks(const MyString& username)  {
-  //  std::ifstream ifs(taskFile.c_str(), std::ios::binary);
-  //  std::ofstream ofs("temp.dat", std::ios::binary);
-  //  bool userFound = false;
-
-  //  if (ifs&&ofs) {
-  //      while (!ifs.eof()) {
-  //          User tempUser;
-  //          tempUser.deserializeUser(ifs);
-  //          if (!ifs) break;
-  //          if (tempUser.getUsername() == username) {
-  //              currentUser->serializeUser(ofs);
-  //              currentUser->serializeTasks(ofs);
-  //              /*ifs.ignore(std::numeric_limits<std::streamsize>::max(), '\n');*/
-  //              userFound = true;
-  //              tempUser.deserializeTasks(ifs);
-  //          }
-  //          else {
-  //              tempUser.serializeUser(ofs);
-  //              tempUser.deserializeTasks(ifs);
-  //              if (!ifs) break;
-  //              tempUser.serializeTasks(ofs);
-  //          }
-  //      }
-  //  }
-
-  //  if (!userFound && currentUser) {
-  //      currentUser->serializeUser(ofs);
-  //      currentUser->serializeTasks(ofs);
-  //  }
-
-  //  ifs.close();
-  //  ofs.close();
-  /////* da se napravi bez tezi*/ remove(taskFile.c_str());
-  /////* da se napravi bez tezi*/  rename("temp.dat", taskFile.c_str());
-  //  if (!userFound && currentUser) 
-  //  {
-  //      std::ofstream ofs_app(taskFile.c_str(), std::ios::binary | std::ios::app);
-  //      if (ofs_app) {
-  //          currentUser->serializeUser(ofs_app);
-  //          currentUser->serializeTasks(ofs_app);
-  //          ofs_app.close();
-  //      }
-  //      else {
-  //          throw std::runtime_error("Error while openning file for appending");
-  //      }
-  //  }
-
-  /*  std::ofstream ofs(taskFile.c_str(), std::ios::binary | std::ios::app);
-    if (ofs) {
-        for (size_t i = 0; i < users.getSize(); ++i) {
-            if (users[i].getUsername() == username) {
-                users[i].serializeUser(ofs);
-                users[i].serializeTasks(ofs);
-            }
-        }
-    }*/
-    std::ofstream ofs(taskFile.c_str(), std::ios::binary | std::ios::app);
-    size_t usernameLength = username.getSize();
-    ofs.write(reinterpret_cast<const char*>(&usernameLength), sizeof(usernameLength));
-    ofs.write(username.c_str(), usernameLength);
-
-    size_t taskCount = currentUser->getTasks().getSize();
-    ofs.write(reinterpret_cast<const char*>(&taskCount), sizeof(taskCount));
-    currentUser->serializeTasks(ofs);
-    ofs.close();
-    /*!!!
-
-    std::ifstream ifs(taskFile.c_str(), std::ios::binary);
-    std::ofstream ofs("temp.dat", std::ios::binary);
-    bool userFound = false;
-
-    if (ifs && ofs) {
-        while (!ifs.eof()) {
-            User tempUser;
-            tempUser.deserializeUser(ifs);
-            if (!ifs) break;
-            if (tempUser.getUsername() == username) {
-                currentUser->serializeUser(ofs);
-                currentUser->serializeTasks(ofs);
-                userFound = true;
-                tempUser.deserializeTasks(ifs);
-            }
-            else {
-                tempUser.serializeUser(ofs);
-                tempUser.deserializeTasks(ifs);
-                if (!ifs) break;
-                tempUser.serializeTasks(ofs);
-            }
-        }
-    }
-
-    if (!userFound && currentUser) {
-        currentUser->serializeUser(ofs);
-        currentUser->serializeTasks(ofs);
-    }
-
-    ifs.close();
-    ofs.close();
-    remove(taskFile.c_str());
-    rename("temp.dat", taskFile.c_str());*/
-
-}
-
-User* UserManager::findUser(const MyString& username) 
+void UserManager::saveTasks(const MyString& username) const
 {
-    for (size_t i = 0; i < users.getSize(); i++) 
+    if (!currentUser)
     {
-        if (users[i].getUsername() == username) {
+        return;
+    }
+
+    std::ofstream ofs(taskFile.c_str(), std::ios::binary | std::ios::trunc);
+    size_t taskCount = currentUser->getTasks().getSize();
+    ofs.write((const char*)&taskCount, sizeof(taskCount));
+    for (size_t i = 0; i < taskCount; i++)
+    {
+        char type;
+        if (currentUser->getTasks()[i]->getType() == "ProjectTask")
+        {
+            type = 'P';
+        }
+        else
+        {
+            type = 'T';
+        }
+        ofs.write(&type, sizeof(type));
+        currentUser->getTasks()[i]->serialize(ofs);
+    }
+    currentUser->getDashboard().serialize(ofs);
+    ofs.close();
+
+}
+
+User* UserManager::findUser(const MyString& username)
+{
+    for (size_t i = 0; i < users.getSize(); i++)
+    {
+        if (users[i].getUsername() == username) 
+        {
             return &users[i];
         }
     }
     return nullptr;
 }
 
-User* UserManager::getCurrentUser() const {
+User* UserManager::getCurrentUser() const 
+{
     return currentUser;
 }
 
 void UserManager::updateTaskName(int id, const MyString& name)
 {
-    if (currentUser) {
+    if (currentUser) 
+    {
         currentUser->updateTaskName(id, name);
         saveTasks(currentUser->getUsername());
-       /* saveUsers();*/ // Save users after updating the task name
+    
     }
-    else {
+    else 
+    {
         throw std::runtime_error("No user is logged in!");
     }
 }
 
-void UserManager::updateTaskDescription(int id, const MyString& description) {
-    if (currentUser) {
+void UserManager::updateTaskDescription(int id, const MyString& description) 
+{
+    if (currentUser) 
+    {
         currentUser->updateTaskDescription(id, description);
         saveTasks(currentUser->getUsername());
-        /*saveUsers();*/ // Save users after updating the task description
     }
-    else {
+    else
+    {
         throw std::runtime_error("No user is logged in!");
     }
 }
 
-void UserManager::removeTaskFromDashboard(int id) {
-    if (currentUser) {
+void UserManager::removeTaskFromDashboard(int id)
+{
+    if (currentUser) 
+    {
         currentUser->removeTaskFromDashboard(id);
         saveTasks(currentUser->getUsername());
-       /* saveUsers();*/ // Save users after removing the task from the dashboard
+        saveDashboard();
+      
     }
-    else {
+    else 
+    {
         throw std::runtime_error("No user is logged in!");
     }
 }
 
-void UserManager::addTaskToDashboard(int id) {
-    if (currentUser) {
+void UserManager::addTaskToDashboard(int id)
+{
+    if (currentUser) 
+    {
         currentUser->addTaskToDashboard(id);
         saveTasks(currentUser->getUsername());
-       /* saveUsers();*/ // Save users after adding the task to the dashboard
+        saveDashboard();
+   
     }
-    else {
+    else 
+    {
         throw std::runtime_error("No user is logged in!");
     }
 }
 
-void UserManager::deleteTask(int id) {
-    if (currentUser) {
+void UserManager::deleteTask(int id) 
+{
+    if (currentUser) 
+    {
         currentUser->deleteTask(id);
         saveTasks(currentUser->getUsername());
-        //saveUsers(); // Save users after deleting the task
+       
     }
-    else {
+    else 
+    {
         throw std::runtime_error("No user is logged in!");
     }
 }
@@ -578,6 +299,7 @@ void UserManager::startTask(int id)
     {
         currentUser->startTask(id);
         saveTasks(currentUser->getUsername());
+        saveDashboard();
     }
     else
     {
@@ -589,12 +311,246 @@ void UserManager::addTask(const MyString& name, const MyString& dueDate, const M
 {
     if (currentUser)
     {
-        currentUser->addTask(name,dueDate,description);
+        currentUser->addTask(name, dueDate, description);
         saveTasks(currentUser->getUsername());
     }
     else
     {
         throw std::runtime_error("No user is logged in!");
 
+    }
+}
+
+void UserManager::listDashboard() const
+{
+    if (currentUser) 
+    {
+        currentUser->getDashboard();
+    }
+    else 
+    {
+        throw std::runtime_error("No user is logged in!");
+    }
+}
+
+void UserManager::finishTask(int id) 
+{
+    if (currentUser) 
+    {
+        currentUser->finishTask(id);
+        saveTasks(currentUser->getUsername());
+        saveDashboard();
+    }
+    else
+    {
+        throw std::runtime_error("No user is logged in!");
+    }
+}
+
+void UserManager::loadCollaborations() 
+{
+    std::ifstream ifs(collabFile.c_str(), std::ios::binary);
+    if (!ifs.is_open()) return;
+
+    size_t collabCount;
+    ifs.read((char*)&collabCount, sizeof(collabCount));
+    for (size_t i = 0; i < collabCount; i++) 
+    {
+        Collaboration collab;
+        collab.deserialize(ifs);
+        collaborations.pushBack(collab);
+    }
+    ifs.close();
+}
+
+void UserManager::saveCollaborations() const 
+{
+    std::ofstream ofs(collabFile.c_str(), std::ios::binary | std::ios::trunc);
+    size_t collabCount = collaborations.getSize();
+    ofs.write((const char*)&collabCount, sizeof(collabCount));
+    for (size_t i = 0; i < collabCount; i++) 
+    {
+        collaborations[i].serialize(ofs);
+    }
+    ofs.close();
+}
+
+void UserManager::addCollaboration(const MyString& name) 
+{
+    if (currentUser == nullptr) 
+    {
+        throw std::runtime_error("No user is logged in!");
+    }
+    int newId = collaborations.getSize() + 1;
+    Collaboration newCollab(newId, name, currentUser->getUsername());
+    collaborations.pushBack(newCollab);
+    saveCollaborations();
+}
+
+void UserManager::deleteCollaboration(const MyString& name)
+{
+    if (currentUser == nullptr) 
+    {
+        throw std::runtime_error("No user is logged in!");
+    }
+
+    for (size_t i = 0; i < collaborations.getSize(); i++)
+    {
+        if (collaborations[i].getName() == name) 
+        {
+            if (collaborations[i].getCreator() != currentUser->getUsername()) 
+            {
+                throw std::runtime_error("You need to be the creator in order to delete this collaboration!");
+            }
+            collaborations.erase(i);
+            saveCollaborations();
+            return;
+        }
+    }
+    throw std::runtime_error("Collaboration not found!");
+}
+
+void UserManager::listCollaborations() const 
+{
+    if (currentUser == nullptr) 
+    {
+        throw std::runtime_error("No user is logged in!");
+    }
+
+    std::cout << "Collaborations:" << std::endl;
+    for (size_t i = 0; i < collaborations.getSize(); i++) 
+    {
+        const Collaboration& collab = collaborations[i];
+        if (collab.getCreator() == currentUser->getUsername() || collab.isParticipant(currentUser->getUsername()))
+        {
+            collab.showCollaboration();
+        }
+    }
+}
+
+void UserManager::addUserToCollaboration(const MyString& collabName, const MyString& username)
+{
+    Collaboration* collab = findCollaborationByName(collabName);
+    if (collab == nullptr)
+    {
+        throw std::runtime_error("Collaboration not found!");
+    }
+    collab->addParticipant(username);
+    saveCollaborations();
+    
+}
+
+void UserManager::assignTaskToCollaboration(const MyString& collabName, const MyString& username, const MyString& taskName, const MyString& dueDate, const MyString& description)
+{
+    Collaboration* collab = findCollaborationByName(collabName);
+    if (collab == nullptr)
+    {
+        throw std::runtime_error("Collaboration not found!");
+    }
+    collab->assignTask(username, taskName, dueDate, description);
+    saveCollaborations();
+   
+}
+
+void UserManager::listCollaborationTasks(const MyString& collabName) const 
+{
+    const Collaboration* collab = findCollaborationByName(collabName);
+    if (collab == nullptr)
+    {
+        throw std::runtime_error("Collaboration not found!");
+    }
+    collab->listTasks();
+}
+
+const Collaboration* UserManager::findCollaborationByName(const MyString& name) const
+{
+    for (size_t i = 0; i < collaborations.getSize(); i++)
+    {
+        if (collaborations[i].getName() == name) 
+        {
+            return &collaborations[i];
+        }
+    }
+    return nullptr;
+}
+
+Collaboration* UserManager::findCollaborationByName(const MyString& name) 
+{
+    for (size_t i = 0; i < collaborations.getSize(); i++) 
+    {
+        if (collaborations[i].getName() == name)
+        {
+            return &collaborations[i];
+        }
+    }
+    return nullptr;
+}
+
+void UserManager::saveDashboard() const
+{
+    if (!currentUser)
+    {
+        return;
+    }
+
+    std::ofstream ofs(dashboardFile.c_str(), std::ios::binary);
+    if (!ofs) {
+        throw std::runtime_error("Could not open file for saving dashboard.");
+        return;
+    }
+
+    size_t userCount = users.getSize();
+    ofs.write((const char*)&userCount, sizeof(userCount));
+
+    for (size_t i = 0; i < userCount; i++) 
+    {
+        const User& user = users[i];
+        size_t usernameLen = user.getUsername().getSize();
+        ofs.write((const char*)&usernameLen, sizeof(usernameLen));
+        ofs.write(user.getUsername().c_str(), usernameLen);
+        user.getDashboard().serialize(ofs);
+    }
+
+    ofs.close();
+    if (!ofs)
+    {
+       throw std::runtime_error("Could not write to dashboard file.");
+    }
+}
+
+void UserManager::loadDashboard() 
+{
+    std::ifstream ifs(dashboardFile.c_str(), std::ios::binary);
+    if (!ifs) 
+    {
+        throw std::runtime_error("Could not open file for loading dashboard." );
+        return;
+    }
+
+    size_t userCount;
+    ifs.read((char*)&userCount, sizeof(userCount));
+
+    for (size_t i = 0; i < userCount; i++) 
+    {
+        size_t usernameLen;
+        ifs.read((char*)&usernameLen, sizeof(usernameLen));
+        char* usernameBuffer = new char[usernameLen + 1];
+        ifs.read(usernameBuffer, usernameLen);
+        usernameBuffer[usernameLen] = '\0';
+        MyString username(usernameBuffer);
+        delete[] usernameBuffer;
+
+        User* user = findUser(username);
+        if (!user)
+        {
+            throw std::runtime_error("User not found while loading dashboard.");
+        }
+        user->getDashboard().deserialize(ifs);
+    }
+
+    ifs.close();
+    if (!ifs)
+    {
+        throw std::runtime_error("Could not read from dashboard file." );
     }
 }
