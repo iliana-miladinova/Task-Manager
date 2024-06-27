@@ -25,9 +25,18 @@ private:
     void saveDashboard() const;
     void loadDashboard();
 
+    void copyFrom(const UserManager& other);
+    void moveFrom(UserManager&& other);
+    void free();
+
 public:
     UserManager();
     ~UserManager();
+
+    UserManager(const UserManager& other);
+    UserManager& operator=(const UserManager& other);
+    UserManager(UserManager&& other) noexcept;
+    UserManager& operator=(UserManager&& other) noexcept;
 
     void registerUser(const MyString& username, const MyString& password);
     void loginUser(const MyString& username, const MyString& password);

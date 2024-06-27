@@ -1,10 +1,40 @@
 #include "UserManager.h"
 #include <fstream>
 
-UserManager::UserManager() 
+UserManager::UserManager()
 {
     loadUsers();
     loadCollaborations();
+}
+
+UserManager::UserManager(const UserManager& other)
+{
+    copyFrom(other);
+}
+
+UserManager& UserManager::operator=(const UserManager& other)
+{
+    if (this!=&other)
+    {
+        free();
+        copyFrom(other);
+    }
+    return *this;
+}
+
+UserManager::UserManager(UserManager&& other) noexcept
+{
+    moveFrom(std::move(other));
+}
+
+UserManager& UserManager::operator=(UserManager&& other) noexcept
+{
+    if (this!=&other)
+    {
+        free();
+        moveFrom(std::move(other));
+    }
+    return *this;
 }
 
 UserManager::~UserManager() 
@@ -16,6 +46,29 @@ UserManager::~UserManager()
         saveDashboard();
     }
     saveUsers();
+    free();
+}
+
+void UserManager::copyFrom(const UserManager& other)
+{
+    users = other.users;
+    collaborations = other.collaborations;
+    currentUser = other.currentUser;
+
+}
+
+void UserManager::moveFrom(UserManager&& other)
+{
+    users = std::move(other.users);
+    collaborations = std::move(other.collaborations);
+    currentUser = other.currentUser;
+    other.currentUser = nullptr;
+}
+
+void UserManager::free()
+{
+    delete currentUser;
+    currentUser = nullptr;
 }
 
 void UserManager::registerUser(const MyString& username, const MyString& password) 
@@ -325,7 +378,7 @@ void UserManager::listDashboard() const
 {
     if (currentUser) 
     {
-        currentUser->getDashboard();
+        currentUser->getDashboard().showTask();
     }
     else 
     {
